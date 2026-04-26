@@ -1,9 +1,7 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
 
-/* JDM Retro Rides — Dark Heritage Design System
-   Charcoal + Bronze. All colors HSL.
-*/
+/* JDM Retro Rides — Dark Heritage Design System */
 
 @theme {
   /* Core surfaces — deep charcoal */
@@ -56,7 +54,7 @@
   --background-image-gradient-bronze: linear-gradient(135deg, hsl(32 55% 52%), hsl(36 70% 62%));
   --background-image-gradient-hero: linear-gradient(180deg, hsl(24 10% 5% / 0.2) 0%, hsl(24 10% 5% / 0.5) 50%, hsl(24 10% 5% / 0.95) 100%);
   --background-image-gradient-card: linear-gradient(180deg, hsl(24 8% 12%) 0%, hsl(24 10% 8%) 100%);
-  
+
   --shadow-bronze: 0 8px 30px -8px hsl(32 55% 52% / 0.35);
   --shadow-deep: 0 24px 60px -20px hsl(0 0% 0% / 0.6);
 }
@@ -74,7 +72,10 @@
     font-feature-settings: 'ss01', 'cv11';
   }
 
-  h1, h2, h3, .display {
+  h1,
+  h2,
+  h3,
+  .display {
     font-family: var(--font-display);
     letter-spacing: 0.01em;
   }
@@ -88,18 +89,23 @@
   .gradient-bronze {
     background-image: var(--background-image-gradient-bronze);
   }
+
   .gradient-hero {
     background-image: var(--background-image-gradient-hero);
   }
+
   .gradient-card {
     background-image: var(--background-image-gradient-card);
   }
+
   .shadow-bronze {
     box-shadow: var(--shadow-bronze);
   }
+
   .shadow-deep {
     box-shadow: var(--shadow-deep);
   }
+
   .grain::before {
     content: '';
     position: absolute;
