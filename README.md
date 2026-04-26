@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # JDM Retro Rides
 
 Specialist supplier of legendary Japanese domestic market classics since 1996.
@@ -21,3 +25,4 @@ This platform manages a curated inventory of JDM classics, providing potential b
 
 ---
 *Latest Sync: 2026-04-26*
+*Test comment 2026-04-26 4:57 pm
