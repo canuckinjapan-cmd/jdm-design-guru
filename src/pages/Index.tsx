@@ -23,22 +23,11 @@ import auctionLane from "@/assets/auction-lane.jpg";
 import SiteNav from "@/components/SiteNav";
 import ContactForm from "@/components/ContactForm";
 import FacebookIcon from "@/components/icons/FacebookIcon";
-import { inventory } from "@/data/inventory";
+import { inventory, statusStyles, Vehicle } from "@/data/inventory";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import SlideshowModal from "@/components/SlideshowModal";
 import { VehicleDetailsOverlay } from "@/components/VehicleDetailsOverlay";
-import { 
-  db, 
-  collection, 
-  getDocs, 
-  query, 
-  where, 
-  orderBy, 
-  handleFirestoreError, 
-  OperationType,
-  Vehicle,
-  statusStyles 
-} from "@/lib/firebase";
+import { db, collection, getDocs, query, where, orderBy } from "@/lib/firebase";
 
 const FACEBOOK_URL = "https://www.facebook.com/";
 
@@ -81,10 +70,9 @@ const Index = () => {
 
   useEffect(() => {
     const fetchFeatured = async () => {
-      const path = "vehicles";
       try {
         const q = query(
-          collection(db, path), 
+          collection(db, "vehicles"),
           where("featured", "==", true),
           orderBy("featuredOrder", "asc")
         );
@@ -94,7 +82,7 @@ const Index = () => {
           setFeaturedVehicles(list);
         }
       } catch (error) {
-        handleFirestoreError(error, OperationType.LIST, path);
+        console.error("Error fetching featured vehicles:", error);
       }
     };
     fetchFeatured();
@@ -130,7 +118,7 @@ const Index = () => {
       <SiteNav />
 
       {/* HERO */}
-      <section className="relative min-h-[100svh] flex items-end overflow-hidden grain">
+      <section className="relative min-h-[100svh] flex items-center overflow-hidden grain">
         <img
           ref={heroImgRef}
           src={heroImg}
@@ -145,7 +133,7 @@ const Index = () => {
         <div className="absolute inset-0 gradient-hero" />
         <div className="absolute inset-0 bg-background/30" />
 
-        <div className="relative max-w-7xl mx-auto px-6 pb-20 pt-32 w-full">
+        <div className="relative max-w-7xl mx-auto px-6 py-20 w-full">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
               <span className="h-px w-10 bg-bronze" />
@@ -238,73 +226,72 @@ const Index = () => {
                   className="group gradient-card border border-border rounded-sm shadow-deep hover:border-bronze/50 transition-all duration-500 relative scroll-mt-24"
                 >
                   {!activeVehicle || activeVehicle.id !== c.id ? (
-                  <>
-                    <div
-                      className={`relative aspect-[16/10] overflow-hidden bg-secondary group/main ${
-                        c.images && c.images.length > 0 ? "cursor-pointer" : ""
-                      }`}
-                      onClick={() => openSlideshow(c.images || [c.img])}
-                    >
-                      <img
-                        src={c.images ? c.images[0] : c.img}
-                        alt={`${c.year} ${c.name}`}
-                        loading="lazy"
-                        width={1280}
-                        height={800}
-                        className="w-full h-full object-cover transition-transform duration-700 lg:group-hover/main:scale-105"
-                      />
-                      {c.images && c.images.length > 0 && (
-                        <div className="absolute inset-0 pointer-events-none">
-                          <ZoomIn className="text-white opacity-0 group-hover/main:opacity-100 w-10 h-10 transition-opacity absolute top-4 right-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]" />
-                        </div>
-                      )}
-                      <div className="absolute top-4 left-4 flex gap-2">
-                        <Badge
-                          variant="outline"
-                          className={`rounded-sm uppercase tracking-wider text-[10px] font-mono ${statusStyles[c.status]}`}
-                        >
-                          {c.status}
-                        </Badge>
-                        <Badge
-                          variant="outline"
-                          className="rounded-sm uppercase tracking-wider text-[10px] font-mono bg-background/60 backdrop-blur-sm border-border text-foreground/80"
-                        >
-                          {c.grade}
-                        </Badge>
-                      </div>
-                      <div className="absolute bottom-4 right-4 mono text-xs px-2 py-1 bg-background/70 backdrop-blur-sm border border-border rounded-sm">
-                        {c.chassis}
-                      </div>
-                    </div>
-
-                    <div className="p-6">
-                      <div className="flex items-start justify-between gap-4 mb-5">
-                        <div>
-                          <div className="mono text-xs text-bronze tracking-wider mb-1">{c.year}</div>
-                          <h3 className="font-display text-3xl leading-none">{c.name}</h3>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex flex-col items-end">
-                            <span>Price {currency !== 'JPY' && '· Approx'}</span>
+                    <>
+                      <div
+                        className={`relative aspect-[16/10] overflow-hidden bg-secondary group/main ${c.images && c.images.length > 0 ? "cursor-pointer" : ""
+                          }`}
+                        onClick={() => openSlideshow(c.images || [c.img])}
+                      >
+                        <img
+                          src={c.images ? c.images[0] : c.img}
+                          alt={`${c.year} ${c.name}`}
+                          loading="lazy"
+                          width={1280}
+                          height={800}
+                          className="w-full h-full object-cover transition-transform duration-700 lg:group-hover/main:scale-105"
+                        />
+                        {c.images && c.images.length > 0 && (
+                          <div className="absolute inset-0 pointer-events-none">
+                            <ZoomIn className="text-white opacity-0 group-hover/main:opacity-100 w-10 h-10 transition-opacity absolute top-4 right-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]" />
                           </div>
-                          <div className="font-display text-2xl text-bronze">{convertPrice(c.priceJPY).formatted}</div>
+                        )}
+                        <div className="absolute top-4 left-4 flex gap-2">
+                          <Badge
+                            variant="outline"
+                            className={`rounded-sm uppercase tracking-wider text-[10px] font-mono ${statusStyles[c.status]}`}
+                          >
+                            {c.status}
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="rounded-sm uppercase tracking-wider text-[10px] font-mono bg-background/60 backdrop-blur-sm border-border text-foreground/80"
+                          >
+                            {c.grade}
+                          </Badge>
+                        </div>
+                        <div className="absolute bottom-4 right-4 mono text-xs px-2 py-1 bg-background/70 backdrop-blur-sm border border-border rounded-sm">
+                          {c.chassis}
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3 text-sm mb-6 pt-5 border-t border-border">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Gauge className="w-4 h-4 text-bronze" /> {c.mileage}
+                      <div className="p-6">
+                        <div className="flex items-start justify-between gap-4 mb-5">
+                          <div>
+                            <div className="mono text-xs text-bronze tracking-wider mb-1">{c.year}</div>
+                            <h3 className="font-display text-3xl leading-none">{c.name}</h3>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex flex-col items-end">
+                              <span>Price {currency !== 'JPY' && '· Approx'}</span>
+                            </div>
+                            <div className="font-display text-2xl text-bronze">{convertPrice(c.priceJPY).formatted}</div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Cog className="w-4 h-4 text-bronze" /> {c.transmission}
+
+                        <div className="grid grid-cols-2 gap-3 text-sm mb-6 pt-5 border-t border-border">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Gauge className="w-4 h-4 text-bronze" /> {c.mileage}
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Cog className="w-4 h-4 text-bronze" /> {c.transmission}
+                          </div>
+                          <div className="mono text-[11px] text-muted-foreground tracking-wider uppercase col-span-1">
+                            {c.displacementLabel}
+                          </div>
+                          <div className="mono text-[11px] text-muted-foreground tracking-wider uppercase col-span-1">
+                            {c.stockNumber ? `Stock: ${c.stockNumber}` : ""}
+                          </div>
                         </div>
-                        <div className="mono text-[11px] text-muted-foreground tracking-wider uppercase col-span-1">
-                          {c.displacementLabel}
-                        </div>
-                        <div className="mono text-[11px] text-muted-foreground tracking-wider uppercase col-span-1">
-                          {c.stockNumber ? `Stock: ${c.stockNumber}` : ""}
-                        </div>
-                      </div>
 
                         <div className="flex flex-col sm:flex-row gap-3">
                           <Button
@@ -330,24 +317,24 @@ const Index = () => {
                             </Link>
                           </Button>
                         </div>
-                    </div>
-                  </>
-                ) : (
-                  <VehicleDetailsOverlay 
-                    vehicle={c} 
-                    onClose={() => setActiveVehicle(null)} 
-                    className={`
+                      </div>
+                    </>
+                  ) : (
+                    <VehicleDetailsOverlay
+                      vehicle={c}
+                      onClose={() => setActiveVehicle(null)}
+                      className={`
                       fixed inset-0 z-[100] rounded-none md:rounded-sm
                       md:absolute md:inset-auto md:top-0 md:h-full md:z-30
                       ${isLeft2Col ? 'md:left-0 md:w-[calc(200%+2rem)]' : 'md:left-[calc(-100%-2rem)] md:w-[calc(200%+2rem)]'}
                       md:landscape:inset-0 md:landscape:left-0 md:landscape:w-full md:landscape:h-full
                       lg:inset-0 lg:left-0 lg:w-full lg:h-full
                     `}
-                  />
-                )}
-              </article>
-            );
-          })}
+                    />
+                  )}
+                </article>
+              );
+            })}
           </div>
 
           <div className="mt-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -503,10 +490,10 @@ const Index = () => {
             {/* Testimonial 1 */}
             <div className="bg-background border border-border group overflow-hidden">
               <div className="aspect-[4/3] overflow-hidden">
-                <img 
-                  src="https://carniche.co.jp/wp-content/uploads/2026/01/1989-Nissan-GTR-wht.jpg" 
-                  alt="1989 Skyline GT-R" 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-hover:duration-700 ease-out" 
+                <img
+                  src="https://carniche.co.jp/wp-content/uploads/2026/01/1989-Nissan-GTR-wht.jpg"
+                  alt="1989 Skyline GT-R"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-hover:duration-700 ease-out"
                 />
               </div>
               <div className="p-8">
@@ -526,10 +513,10 @@ const Index = () => {
             {/* Testimonial 2 */}
             <div className="bg-background border border-border group overflow-hidden">
               <div className="aspect-[4/3] overflow-hidden">
-                <img 
-                  src="https://carniche.co.jp/wp-content/uploads/2026/01/1994-Honda-Beat-red.jpg" 
-                  alt="1994 Honda Beat" 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ease-out" 
+                <img
+                  src="https://carniche.co.jp/wp-content/uploads/2026/01/1994-Honda-Beat-red.jpg"
+                  alt="1994 Honda Beat"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ease-out"
                 />
               </div>
               <div className="p-8">
@@ -549,10 +536,10 @@ const Index = () => {
             {/* Testimonial 3 */}
             <div className="bg-background border border-border group overflow-hidden">
               <div className="aspect-[4/3] overflow-hidden">
-                <img 
-                  src="https://carniche.co.jp/wp-content/uploads/2026/02/2018-Impressa-WRX-Sti-blue.jpg" 
-                  alt="2018 WRX STI" 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ease-out" 
+                <img
+                  src="https://carniche.co.jp/wp-content/uploads/2026/02/2018-Impressa-WRX-Sti-blue.jpg"
+                  alt="2018 WRX STI"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ease-out"
                 />
               </div>
               <div className="p-8 flex flex-col h-[calc(100%-75%)]">
